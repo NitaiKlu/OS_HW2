@@ -1,0 +1,39 @@
+_____________________________________________________________________
+	
+	Setup up to .config change: 
+_____________________________________________________________________
+
+sudo sed -i "s/# deb-src/deb-src/g" /etc/apt/sources.list
+sudo apt update -y
+sudo apt install -y build-essential libncurses-dev bison flex
+sudo apt install -y libssl-dev libelf-dev
+cd ~
+apt source linux
+sudo chown -R student:student ~/linux-4.15.0/
+mv ~/linux-4.15.0 ~/linux-4.15.18-custom
+cd ~/linux-4.15.18-custom
+cp -f /boot/config-$(uname -r) .config
+geany .config
+  ______________________________________
+ |                                      |
+ |	TODO:								|
+ |										|
+ |	CONFIG_LOCALVERSION="-custom"		|
+ |______________________________________|
+
+yes '' | make localmodconfig
+yes '' | make oldconfig
+make -j $(nproc)
+sudo make modules_install
+sudo make install
+sudo update-grub
+sudo reboot
+_____________________________________________________________________
+	 
+	 Recompile the kernel image (only bzImage, without the modules):
+_____________________________________________________________________
+
+cd ~/linux-4.15.18-custom
+make -j $(nproc) bzImage
+sudo cp -f arch/x86/boot/bzImage /boot/vmlinuz-4.15.18-custom
+sudo reboot

@@ -225,8 +225,8 @@ extern struct cred init_cred;
 #define INIT_TASK(tsk)	\
 {									\
 	INIT_TASK_TI(tsk)						\
-	.f_status     = EE                        \   
-	.important_tasks = LIST_HEAD_INIT(tsk)    \
+	.f_status     = EE                        			\
+	.important_tasks = LIST_HEAD_INIT(tsk)    			\
 	.state		= 0,						\
 	.stack		= init_stack,					\
 	.usage		= ATOMIC_INIT(2),				\
