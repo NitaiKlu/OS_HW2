@@ -1,0 +1,5 @@
+/******files changed thus far*****/
+1. kernel/Makefile
+2. kernel/hw2.c
+3. include/linux/syscalls.h
+4. arch/x86/entry/syscalls/syscall_64.tbl
