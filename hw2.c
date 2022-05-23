@@ -3,48 +3,66 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 
-asmlinkage long sys_hello(void) {
- printk("Hello, World!\n");
- return 0;
+struct task_struct *get_init_struct()
+{
+    struct task_struct *current_task = current;
+    while (current_task->pid != 1)
+    {
+        current_task = current_task->real_parent;
+    }
+    return current_task;
 }
 
-asmlinkage int sys_set_status(enum faculty_status status)
+asmlinkage long sys_hello(void)
 {
-    if(status != 0 && status != 1) {
-        return -1 * EINVAL;
+    printk("Hello, World!\n");
+    return 0;
+}
+
+asmlinkage long sys_set_status(enum faculty_status status)
+{
+    if (status != 0 && status != 1)
+    {
+        return -EINVAL;
     }
     current->f_status = status;
     return 0;
 }
 
-asmlinkage int sys_get_status(void)
+asmlinkage long sys_get_status(void)
 {
     return current->f_status;
 }
 
-asmlinkage int sys_register_process(void)
+asmlinkage long sys_register_process(void)
 {
-    struct list_head *new_data;
-    new_data = kmalloc(sizeof(struct list_head), GFP_KERNEL);
-        if(new_data) {
-                list_add(new_data, &(current->important_tasks));
-        }
+    struct list_head *list_ptr;
+    struct task_struct *init_struct = get_init_struct();
+    // list_ptr = kmalloc(sizeof(struct list_head), GFP_KERNEL);
+    list_ptr = &current->important_tasks;
+    if (list_ptr)
+    {
+        list_add(list_ptr, &(init_struct->important_tasks));
+    }
     return 0;
 }
 
 asmlinkage long sys_get_all_cs(void)
 {
     long sum = 0;
-    struct list_head* it;
-    list_for_each(it, &(current->important_tasks)) {
-        struct task_struct* it_pcb = list_entry(it, struct task_struct, important_tasks);
-        if(it_pcb->f_status == 1) {
+    struct list_head *it;
+    struct task_struct *init_struct = get_init_struct();
+    list_for_each(it, &init_struct->important_tasks)
+    {
+        struct task_struct *it_pcb = list_entry(it, struct task_struct, important_tasks);
+        if (it_pcb->f_status == CS_faculty)
+        {
             sum += it_pcb->tgid;
         }
     }
-    if(sum == 0) //error
+    if (sum == 0) // error
     {
-        return -1 * ENODATA;
+        return -ENODATA;
     }
     return sum;
 }

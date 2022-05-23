@@ -225,8 +225,6 @@ extern struct cred init_cred;
 #define INIT_TASK(tsk)	\
 {									\
 	INIT_TASK_TI(tsk)						\
-	.f_status     = EE                        			\
-	.important_tasks = LIST_HEAD_INIT(tsk)    			\
 	.state		= 0,						\
 	.stack		= init_stack,					\
 	.usage		= ATOMIC_INIT(2),				\
@@ -284,6 +282,8 @@ extern struct cred init_cred;
 	},								\
 	.thread_group	= LIST_HEAD_INIT(tsk.thread_group),		\
 	.thread_node	= LIST_HEAD_INIT(init_signals.thread_head),	\
+	.f_status     = EE_faculty,                        			\
+	.important_tasks = LIST_HEAD_INIT(tsk.important_tasks),    			\
 	INIT_IDS							\
 	INIT_PERF_EVENTS(tsk)						\
 	INIT_TRACE_IRQFLAGS						\

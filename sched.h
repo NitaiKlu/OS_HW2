@@ -699,13 +699,7 @@ struct task_struct {
 	struct restart_block		restart_block;
 
 	pid_t				pid;
-	pid_t				tgid;
-    typedef enum {
-        EE = 0, CS = 1
-    } faculty_status;
-    faculty_status              f_status;
-    struct list_head            important_tasks;
-    
+	pid_t				tgid;    
 
 #ifdef CONFIG_CC_STACKPROTECTOR
 	/* Canary value for the -fstack-protector GCC feature: */
@@ -1136,6 +1130,15 @@ struct task_struct {
 	/* Used by LSM modules for access restriction: */
 	void				*security;
 #endif
+
+	typedef enum 
+	{
+        EE_faculty = 0,
+		CS_faculty = 1,
+    } faculty_status;
+    faculty_status f_status;
+	struct list_head important_tasks;
+
 
 	/*
 	 * New fields for task_struct should be added above here, so that
