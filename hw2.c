@@ -3,15 +3,6 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 
-struct task_struct *get_init_struct()
-{
-    struct task_struct *current_task = current;
-    while (current_task->pid != 1)
-    {
-        current_task = current_task->real_parent;
-    }
-    return current_task;
-}
 
 asmlinkage long sys_hello(void)
 {
@@ -37,7 +28,13 @@ asmlinkage long sys_get_status(void)
 asmlinkage long sys_register_process(void)
 {
     struct list_head *list_ptr;
-    struct task_struct *init_struct = get_init_struct();
+    struct task_struct *init_struct;
+    struct task_struct *current_task = current;
+    while (current_task->pid != 1)
+    {
+        current_task = current_task->real_parent;
+    }
+    init_struct = current_task;
     // list_ptr = kmalloc(sizeof(struct list_head), GFP_KERNEL);
     list_ptr = &current->important_tasks;
     if (list_ptr)
@@ -50,11 +47,18 @@ asmlinkage long sys_register_process(void)
 asmlinkage long sys_get_all_cs(void)
 {
     long sum = 0;
-    struct list_head *it;
-    struct task_struct *init_struct = get_init_struct();
+    struct list_head *it;    
+    struct task_struct *init_struct;
+    struct task_struct *it_pcb;
+    struct task_struct *current_task = current;
+    while (current_task->pid != 1)
+    {
+        current_task = current_task->real_parent;
+    }
+    init_struct = current_task;
     list_for_each(it, &init_struct->important_tasks)
     {
-        struct task_struct *it_pcb = list_entry(it, struct task_struct, important_tasks);
+        it_pcb = list_entry(it, struct task_struct, important_tasks);
         if (it_pcb->f_status == CS_faculty)
         {
             sum += it_pcb->tgid;

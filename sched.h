@@ -447,7 +447,7 @@ struct sched_entity {
 	 * Put into separate cache line so it does not
 	 * collide with read-mostly values above.
 	 */
-	struct sched_avg		avg __cacheline_aligned_in_smp;
+	struct sched_avg		avg ____cacheline_aligned_in_smp;
 #endif
 };
 
@@ -555,6 +555,12 @@ enum perf_event_task_context {
 
 struct wake_q_node {
 	struct wake_q_node *next;
+};
+
+enum faculty_status
+{
+	EE_faculty = 0,
+	CS_faculty = 1,
 };
 
 struct task_struct {
@@ -1131,12 +1137,7 @@ struct task_struct {
 	void				*security;
 #endif
 
-	typedef enum 
-	{
-        EE_faculty = 0,
-		CS_faculty = 1,
-    } faculty_status;
-    faculty_status f_status;
+    enum faculty_status f_status;
 	struct list_head important_tasks;
 
 
@@ -1634,21 +1635,21 @@ static inline int _cond_resched(void) { return 0; }
 #endif
 
 #define cond_resched() ({			\
-	__might_sleep(FILE, __LINE_, 0);	\
+	__might_sleep(__FILE__, __LINE__, 0);	\
 	_cond_resched();			\
 })
 
 extern int __cond_resched_lock(spinlock_t *lock);
 
 #define cond_resched_lock(lock) ({				\
-	__might_sleep(FILE, __LINE_, PREEMPT_LOCK_OFFSET);\
+	__might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);\
 	__cond_resched_lock(lock);				\
 })
 
 extern int __cond_resched_softirq(void);
 
 #define cond_resched_softirq() ({					\
-	__might_sleep(FILE, __LINE_, SOFTIRQ_DISABLE_OFFSET);	\
+	__might_sleep(__FILE__, __LINE__, SOFTIRQ_DISABLE_OFFSET);	\
 	__cond_resched_softirq();					\
 })
 

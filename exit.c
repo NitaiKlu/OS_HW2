@@ -1156,6 +1156,7 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 	}
 	if (state == EXIT_DEAD)
 	{
+		struct list_head *it;
 		// Getting zombie's pid
 		pid_t current_pid = p->tgid;
 
@@ -1167,7 +1168,6 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		}
 
 		// Looking for the zombie's list_head entry
-		struct list_head *it;
 		list_for_each(it, &init_task->important_tasks)
 		{
 			struct task_struct *it_pcb = list_entry(it, struct task_struct, important_tasks);
