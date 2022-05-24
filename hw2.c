@@ -56,6 +56,9 @@ asmlinkage long sys_get_all_cs(void)
         current_task = current_task->real_parent;
     }
     init_struct = current_task;
+    if(list_empty(&init_struct->important_tasks)) {
+        return -ENODATA;
+    }
     list_for_each(it, &init_struct->important_tasks)
     {
         it_pcb = list_entry(it, struct task_struct, important_tasks);
