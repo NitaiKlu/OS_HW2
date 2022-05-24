@@ -1203,7 +1203,9 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 	}
 	if (state == EXIT_DEAD)
 	{
+		bool is_in_list = false;
 		struct list_head *it;
+		struct list_head *chosen_it;
 		// Getting zombie's pid
 		pid_t current_pid = p->tgid;
 
@@ -1223,9 +1225,14 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 				if (it_pcb->tgid == current_pid)
 				{
 					// Remove the entry from the list
-					list_del(it);
-					break;
+					is_in_list = true;
+					chosen_it = it;
 				}
+			}
+			// Maybe need to take out of the for loop
+			if (is_in_list)
+			{
+				list_del(chosen_it);
 			}
 		}
 
