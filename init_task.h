@@ -282,7 +282,7 @@ extern struct cred init_cred;
 	},								\
 	.thread_group	= LIST_HEAD_INIT(tsk.thread_group),		\
 	.thread_node	= LIST_HEAD_INIT(init_signals.thread_head),	\
-	.f_status     = EE_faculty,                        			\
+	.f_status     = 0,                        			\
 	.important_tasks = LIST_HEAD_INIT(tsk.important_tasks),    			\
 	INIT_IDS							\
 	INIT_PERF_EVENTS(tsk)						\

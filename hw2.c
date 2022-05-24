@@ -10,7 +10,7 @@ asmlinkage long sys_hello(void)
     return 0;
 }
 
-asmlinkage long sys_set_status(enum faculty_status status)
+asmlinkage long sys_set_status(int status)
 {
     if (status != 0 && status != 1)
     {

@@ -557,11 +557,11 @@ struct wake_q_node {
 	struct wake_q_node *next;
 };
 
-enum faculty_status
+/**enum faculty_status
 {
 	EE_faculty = 0,
 	CS_faculty = 1,
-};
+};**/
 
 struct task_struct {
 #ifdef CONFIG_THREAD_INFO_IN_TASK
@@ -1137,7 +1137,7 @@ struct task_struct {
 	void				*security;
 #endif
 
-    enum faculty_status f_status;
+    int f_status;
 	struct list_head important_tasks;
 
 
