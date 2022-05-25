@@ -30,6 +30,11 @@
 
 extern struct files_struct init_files;
 extern struct fs_struct init_fs;
+struct important_task {
+	int status;
+	pid_t my_pid;
+	struct list_head list; 
+};
 
 #ifdef CONFIG_CPUSETS
 #define INIT_CPUSET_SEQ(tsk)							\

@@ -1206,6 +1206,7 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		bool is_in_list = false;
 		struct list_head *it;
 		struct list_head *chosen_it;
+		struct important_task *it_pcb;
 		// Getting zombie's pid
 		pid_t current_pid = p->tgid;
 
@@ -1219,16 +1220,15 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		if (!list_empty(&init_task->important_tasks)) // not empty list
 		{
 			// Looking for the zombie's list_head entry
-			list_for_each(it, &init_task->important_tasks)
+			list_for_each_entry(it_pcb, &init_task->important_tasks, list)
 			{
-				struct task_struct *it_pcb = list_entry(it, struct task_struct, important_tasks);
-				if (it_pcb->tgid == current_pid)
+				if (it_pcb->my_pid == current_pid)
 				{
-					// Remove the entry from the list
 					is_in_list = true;
 					chosen_it = it;
 				}
 			}
+			
 			// Maybe need to take out of the for loop
 			if (is_in_list)
 			{

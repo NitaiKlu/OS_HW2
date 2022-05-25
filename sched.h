@@ -1137,7 +1137,7 @@ struct task_struct {
 	void				*security;
 #endif
 
-    int f_status;
+    	int f_status;
 	struct list_head important_tasks;
 
 
