@@ -1207,35 +1207,38 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 		struct list_head *it;
 		struct list_head *chosen_head;
 		struct important_task *it_important_task;
-		struct important_task *chosen_task;
-		// Getting zombie's pid
+		// struct important_task *chosen_task;
+		//  Getting zombie's pid
 		pid_t current_pid = p->tgid;
 
 		// Getting init task_struct pointer
 		struct task_struct *init_task = p;
-		while (init_task->pid != 1)
+		while (init_task->pid > 1)
 		{
 			init_task = init_task->real_parent;
 		}
 
-		if (!list_empty(&init_task->important_tasks)) // not empty list
+		if (init_task->pid != 0)
 		{
-			// Looking for the zombie's list_head entry
-			list_for_each_entry(it_important_task, &init_task->important_tasks, list)
+			if (list_empty(&init_task->important_tasks) == 0) // not empty list
 			{
-				if (it_important_task->my_pid == current_pid)
+				// Looking for the zombie's list_head entry
+				list_for_each_entry(it_important_task, &init_task->important_tasks, list)
 				{
-					is_in_list = true;
-					chosen_head = it;
-					chosen_task = it_important_task;
+					if (it_important_task->my_pid == current_pid)
+					{
+						is_in_list = true;
+						chosen_head = it;
+						// chosen_task = it_important_task;
+					}
 				}
-			}
-			
-			// Maybe need to take out of the for loop
-			if (is_in_list)
-			{
-				list_del(chosen_head);
-				KFREE(chosen_task);
+
+				// Maybe need to take out of the for loop
+				if (is_in_list == 1)
+				{
+					list_del(chosen_head);
+					// kvfree(chosen_task);
+				}
 			}
 		}
 

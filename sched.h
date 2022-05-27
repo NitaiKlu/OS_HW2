@@ -557,6 +557,12 @@ struct wake_q_node {
 	struct wake_q_node *next;
 };
 
+struct important_task {
+	int status;
+	pid_t my_pid;
+	struct list_head list; 
+};
+
 struct task_struct {
 #ifdef CONFIG_THREAD_INFO_IN_TASK
 	/*
