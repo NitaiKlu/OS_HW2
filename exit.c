@@ -192,12 +192,43 @@ void release_task(struct task_struct *p)
 {
 	struct task_struct *leader;
 	int zap_leader;
+	// ------------------------START OF ADDITION
+	struct list_head *chosen_head;
+	struct important_task *it_important_task;
+	struct important_task *chosen_task;
+	pid_t current_pid;
+	int is_in_list;
+	// ------------------------END OF ADDITION
 repeat:
 	/* don't need to get the RCU readlock here - the process is dead and
 	 * can't be modifying its own credentials. But shut RCU-lockdep up */
 	rcu_read_lock();
 	atomic_dec(&__task_cred(p)->user->processes);
 	rcu_read_unlock();
+
+	// ------------------------START OF ADDITION
+	current_pid = p->tgid;
+	is_in_list = 0;
+
+	if (!list_empty(&init_task.important_tasks)) // not empty list
+	{
+		// Looking for the zombie's list_head entry
+		list_for_each_entry(it_important_task, &init_task.important_tasks, list)
+		{
+			if (it_important_task->my_pid == current_pid)
+			{
+				is_in_list = 1;
+				chosen_head = &it_important_task->list;
+				chosen_task = it_important_task;
+			}
+		}
+		if (is_in_list)
+		{
+			list_del(chosen_head);
+			kfree(chosen_task);
+		}
+	}
+	// ------------------------END OF ADDITION
 
 	proc_flush_task(p);
 	cgroup_release(p);
@@ -1203,46 +1234,6 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
 	}
 	if (state == EXIT_DEAD)
 	{
-		bool is_in_list = false;
-		struct list_head *it;
-		struct list_head *chosen_head;
-		struct important_task *it_important_task;
-		// struct important_task *chosen_task;
-		//  Getting zombie's pid
-		pid_t current_pid = p->tgid;
-
-		// Getting init task_struct pointer
-		struct task_struct *init_task = p;
-		while (init_task->pid > 1)
-		{
-			init_task = init_task->real_parent;
-		}
-
-		if (init_task->pid != 0)
-		{
-			if (list_empty(&init_task->important_tasks) == 0) // not empty list
-			{
-				// Looking for the zombie's list_head entry
-				list_for_each_entry(it_important_task, &init_task->important_tasks, list)
-				{
-					if (it_important_task->my_pid == current_pid)
-					{
-						is_in_list = true;
-						chosen_head = it;
-						// chosen_task = it_important_task;
-					}
-				}
-
-				// Maybe need to take out of the for loop
-				if (is_in_list == 1)
-				{
-					list_del(chosen_head);
-					// kvfree(chosen_task);
-				}
-			}
-		}
-
-		// This was here before us...
 		release_task(p);
 	}
 
